@@ -11,14 +11,14 @@ migrate = Migrate()
 
 users_to_groups = db.Table(
     'users_to_groups',
-    db.Column('group_id', db.Integer, db.ForeignKey('group.id')),
-    db.Column('user_id', db.Integer, db.ForeignKey('user.id'))
+    db.Column('group_id', db.String(122), db.ForeignKey('group.id')),
+    db.Column('user_id', db.String(122), db.ForeignKey('user.id'))
 )
 
 group_to_permissions = db.Table(
     'group_to_permissions',
-    db.Column('permission_id', db.Integer, db.ForeignKey('permission.id')),
-    db.Column('group_id', db.Integer, db.ForeignKey('group.id')),
+    db.Column('permission_id', db.String(122), db.ForeignKey('permission.id')),
+    db.Column('group_id', db.String(122), db.ForeignKey('group.id')),
 )
 
 
@@ -27,7 +27,7 @@ def generate_uuid():
 
 
 class Permission(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.String(122), default=generate_uuid(), primary_key=True)
     name = db.Column(db.String(122), unique=True)
     description = db.Column(db.Text(), nullable=True)
     groups: Mapped[List["Group"]] = relationship(
@@ -36,7 +36,7 @@ class Permission(db.Model):
 
 
 class Group(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.String(122), default=generate_uuid(), primary_key=True)
     name = db.Column(db.String(122), unique=True)
     users: Mapped[List["User"]] = relationship(
         secondary=users_to_groups, back_populates='groups'
