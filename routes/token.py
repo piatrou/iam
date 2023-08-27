@@ -25,12 +25,12 @@ def get_token():
 
 
 @refresh_token_route.route('/api/iam/token', methods=['GET'])
-@jwt_required
+@jwt_required(refresh=True)
 def refresh_token():
     user_token = IamJwtUser()
     user = user_token.get_db_obj()
     return jsonify({
         "error": None,
-        "token": create_access_token(identity=user.identity)
+        "access_token": create_access_token(identity=user.identity),
+        "refresh_token": create_refresh_token(identity=user.identity)
     })
-
