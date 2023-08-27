@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required
 from iam.library.iam_jwt_user import IamJwtUser
 from iam.library.validate import validate_group_name, DataValidationError
-from iam.models import db, Group
+from iam.models import db, Group, Permission
 
 
 create_group_route = Blueprint('create_group', __name__)
@@ -33,6 +33,7 @@ def create_group():
 @jwt_required()
 def delete_group(id: str):
     user = IamJwtUser()
+    id = str(id)
     if not user.has_rights('iam_delete_group'):
         return jsonify({'error': f"User {user.identity['username']} doesn't have rights to delete groups."})
 
@@ -88,7 +89,38 @@ def get_group(id: str):
     return jsonify({'error': None, 'data': group.full})
 
 
-@edit_group_route.route('/api/iam/group/<id>', methods=[])
+@edit_group_route.route('/api/iam/group/<id>', methods=['PUT'])
 @jwt_required()
 def edit_group(id: str):
-    pass
+    user = IamJwtUser()
+    id = str(id)
+
+    if not user.has_rights('iam_edit_group'):
+        return jsonify({'error': f"User {user.identity['username']} doesn't have rights to edit groups."})
+
+    group = Group.query.get(id)
+
+    if group is None:
+        return {'error': 'Group not found.'}, 404
+
+    try:
+        name = request.json.get('name', None)
+        permissions = request.json.get('permissions', None)
+
+        if name is not None:
+            validate_group_name(name)
+            name = str(name)
+            group.name = name
+
+        if permissions is not None:
+            permissions = list(permissions)
+            group.permissions = Permission.query.filter(Permission.name.in_(permissions)).all()
+
+        db.session.commit()
+
+        return jsonify({'error': None})
+
+    except (DataValidationError, ValueError) as e:
+        if type(e) == 'ValueError':
+            return jsonify({'error': 'Wrong input data'})
+        return jsonify(e.response), e.code
