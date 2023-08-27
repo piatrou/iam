@@ -12,7 +12,7 @@ get_group_route = Blueprint('get_group', __name__)
 edit_group_route = Blueprint('edit_group', __name__)
 
 
-@create_group_route.route('/api/iam/group', methods=[])
+@create_group_route.route('/api/iam/group', methods=['POST'])
 @jwt_required()
 def create_group():
     user = IamJwtUser()
@@ -29,11 +29,20 @@ def create_group():
     return jsonify({'error': None})
 
 
-
-@delete_group_route.route('/api/iam/group/<id>', methods=[])
+@delete_group_route.route('/api/iam/group/<id>', methods=['DELETE'])
 @jwt_required()
 def delete_group(id: str):
-    pass
+    user = IamJwtUser()
+    if not user.has_rights('iam_delete_group'):
+        return jsonify({'error': f"User {user.identity['username']} doesn't have rights to delete groups."})
+
+    group = Group.query.get(id)
+    if group is None:
+        return {'error': 'Group not found.'}, 404
+
+    db.session.delete(group)
+    db.session.commit()
+    return jsonify({'error': None})
 
 
 @get_groups_route.route('/api/iam/group', methods=[])
