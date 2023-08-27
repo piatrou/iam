@@ -32,7 +32,7 @@ def create_group():
 
 @delete_group_route.route('/api/iam/group/<id>', methods=[])
 @jwt_required()
-def delete_group(id: str):
+def delete_group(id: int):
     pass
 
 
@@ -44,11 +44,11 @@ def get_groups():
 
 @get_group_route.route('/api/iam/group/<id>', methods=[])
 @jwt_required()
-def get_group(id: str):
+def get_group(id: int):
     pass
 
 
 @edit_group_route.route('/api/iam/group/<id>', methods=[])
 @jwt_required()
-def edit_group(id: str):
+def edit_group(id: int):
     pass
