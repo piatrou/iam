@@ -71,10 +71,21 @@ def get_groups():
     })
 
 
-@get_group_route.route('/api/iam/group/<id>', methods=[])
+@get_group_route.route('/api/iam/group/<id>', methods=['GET'])
 @jwt_required()
 def get_group(id: str):
-    pass
+    user = IamJwtUser()
+    id = str(id)
+
+    if not user.has_rights('iam_get_group'):
+        return jsonify({'error': f"User {user.identity['username']} doesn't have rights to get groups."})
+
+    group = Group.query.get(id)
+
+    if group is None:
+        return {'error': 'Group not found.'}, 404
+
+    return jsonify({'error': None, 'data': group.full})
 
 
 @edit_group_route.route('/api/iam/group/<id>', methods=[])
