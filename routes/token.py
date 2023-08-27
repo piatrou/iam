@@ -29,6 +29,8 @@ def get_token():
 def refresh_token():
     user_token = IamJwtUser()
     user = user_token.get_db_obj()
+    if user is None:
+        return {'error': 'User not found.'}, 403
     return jsonify({
         "error": None,
         "access_token": create_access_token(identity=user.identity),
