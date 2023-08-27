@@ -73,14 +73,14 @@ def get_users():
 
 @get_user_route.route('/api/iam/user/<id>', methods=['GET'])
 @jwt_required()
-def get_user(id: str = 'self'):
+def get_user(id: int = 0):
     try:
-        id = str(id)
+        id = int(id)
     except ValueError:
-        id = 'self'
+        id = 0
     current_user = IamJwtUser()
 
-    if id == 'self':
+    if id == 0:
         return jsonify(current_user.identity)
 
     if not current_user.has_rights('iam_get_user'):
@@ -98,11 +98,11 @@ def get_user(id: str = 'self'):
 
 @edit_user_route.route('/api/iam/user/<id>', methods=['PUT'])
 @jwt_required()
-def edit_user(id: str = 'self'):
+def edit_user(id: int = 0):
     try:
-        id = str(id)
+        id = int(id)
     except ValueError:
-        id = 'self'
+        id = 0
     current_user = IamJwtUser()
 
     if not current_user.has_rights('iam_edit_user') and id != 0:
@@ -110,7 +110,7 @@ def edit_user(id: str = 'self'):
             'error': f"User {current_user.identity['username']} doesn't have permissions to edit users"
         }), 403
 
-    if id == 'self':
+    if id == 0:
         user = current_user.get_db_obj()
     else:
         user = User.query.get(id)
@@ -154,14 +154,14 @@ def edit_user(id: str = 'self'):
 
 @delete_user_route.route('/api/iam/user/<id>', methods=['DELETE'])
 @jwt_required()
-def delete_user(id: str = 'self'):
+def delete_user(id: int = 0):
     try:
         id = int(id)
     except ValueError:
-        id = 'self'
+        id = 0
     current_user = IamJwtUser()
 
-    if not current_user.has_rights('iam_delete_user') and id != 'self':
+    if not current_user.has_rights('iam_delete_user') and id != 0:
         return jsonify({
             'error': f"User {current_user.identity['username']} doesn't have permissions to delete users"
         }), 403
