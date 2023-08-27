@@ -166,7 +166,7 @@ def delete_user(id: str = 'self'):
             'error': f"User {current_user.identity['username']} doesn't have permissions to delete users"
         }), 403
 
-    if id == 0:
+    if id == 'self':
         user = current_user.get_db_obj()
     else:
         user = User.query.get(id)
