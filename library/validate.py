@@ -1,4 +1,4 @@
-from iam.models import User
+from iam.models import User, Group, Permission
 
 
 class DataValidationError(BaseException):
@@ -18,8 +18,7 @@ def validate_username(username: str):
         raise DataValidationError('Username must be longer than 3 symbols.')
     if len(username) > 122:
         raise DataValidationError('Username can\'t be longer than 122 symbols.')
-    user = User.query.filter_by(username=username).first()
-    if user is not None:
+    if User.query.filter_by(username=username).first() is not None:
         raise DataValidationError(f'Username already exists.')
 
 
@@ -44,3 +43,14 @@ def validate_group_name(name: str):
         raise DataValidationError('Group name must be longer than 3 symbols.')
     if len(name) > 122:
         raise DataValidationError('Group name can\'t be longer than 122 symbols.')
+    if Group.query.filter_by(name=name).first() is not None:
+        raise DataValidationError(f'Group {name} already exists.')
+
+
+def validate_permission_name(name: str):
+    if len(name) <= 3:
+        raise DataValidationError('Permission name must be longer than 3 symbols.')
+    if len(name) > 122:
+        raise DataValidationError('Permission name can\'t be longer than 122 symbols.')
+    if Permission.query.filter_by(name=name).first() is not None:
+        raise DataValidationError(f'Permission {name} already exists.')
