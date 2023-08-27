@@ -27,7 +27,7 @@ def generate_uuid():
 
 
 class Permission(db.Model):
-    id = db.Column(db.String(122), default=generate_uuid(), primary_key=True)
+    id = db.Column(db.String(122), default=generate_uuid, primary_key=True)
     name = db.Column(db.String(122), unique=True)
     description = db.Column(db.Text(), nullable=True)
     groups: Mapped[List["Group"]] = relationship(
@@ -36,7 +36,7 @@ class Permission(db.Model):
 
 
 class Group(db.Model):
-    id = db.Column(db.String(122), default=generate_uuid(), primary_key=True)
+    id = db.Column(db.String(122), default=generate_uuid, primary_key=True)
     name = db.Column(db.String(122), unique=True)
     users: Mapped[List["User"]] = relationship(
         secondary=users_to_groups, back_populates='groups'
@@ -47,7 +47,7 @@ class Group(db.Model):
 
 
 class User(db.Model):
-    id = db.Column(db.String(122), default=generate_uuid(), primary_key=True)
+    id = db.Column(db.String(122), default=generate_uuid, primary_key=True)
     active = db.Column(db.Boolean(), default=False)
     username = db.Column(db.String(122))
     name = db.Column(db.String(122))
