@@ -3,6 +3,7 @@ from sqlalchemy.orm import Mapped, relationship
 from typing import List
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_migrate import Migrate
+import uuid
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -19,6 +20,10 @@ group_to_permissions = db.Table(
     db.Column('permission_id', db.Integer, db.ForeignKey('permission.id')),
     db.Column('group_id', db.Integer, db.ForeignKey('group.id')),
 )
+
+
+def generate_uuid():
+    return str(uuid.uuid4())
 
 
 class Permission(db.Model):
@@ -42,7 +47,7 @@ class Group(db.Model):
 
 
 class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.String(122), default=generate_uuid(), primary_key=True)
     active = db.Column(db.Boolean(), default=False)
     username = db.Column(db.String(122))
     name = db.Column(db.String(122))
