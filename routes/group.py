@@ -45,10 +45,30 @@ def delete_group(id: str):
     return jsonify({'error': None})
 
 
-@get_groups_route.route('/api/iam/group', methods=[])
+@get_groups_route.route('/api/iam/group', methods=['GET'])
 @jwt_required()
 def get_groups():
-    pass
+    user = IamJwtUser()
+    if not user.has_rights('iam_list_groups'):
+        return jsonify({'error': f"User {user.identity['username']} doesn't have rights to list groups."})
+
+    try:
+        page = int(request.args.get('page', 1))
+    except ValueError:
+        page = 1
+
+    search = request.args.get('search', None)
+    if search is not None and search != '':
+        groups = Group.query.filter(Group.name.like(f'%{search}%')).paginate(page=page, per_page=10)
+    else:
+        groups = Group.query.paginate(page=page, per_page=10)
+
+    return jsonify({
+        'error': None,
+        'data': [g.short for g in groups.items],
+        'pages': groups.pages,
+        'page': groups.page
+    })
 
 
 @get_group_route.route('/api/iam/group/<id>', methods=[])

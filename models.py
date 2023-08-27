@@ -34,6 +34,21 @@ class Permission(db.Model):
         secondary=group_to_permissions, back_populates='permissions'
     )
 
+    @property
+    def short(self) -> dict:
+        return {
+            'id': self.id,
+            'name': self.name,
+            'description': self.description
+        }
+
+    @property
+    def full(self):
+        return {
+            **self.short,
+            'groups': [g.short for g in self.groups]
+        }
+
 
 class Group(db.Model):
     id = db.Column(db.String(122), default=generate_uuid, primary_key=True)
@@ -44,6 +59,21 @@ class Group(db.Model):
     permissions: Mapped[List[Permission]] = relationship(
         secondary=group_to_permissions, back_populates='groups'
     )
+
+    @property
+    def short(self) -> dict:
+        return {
+            'id': self.id,
+            'name': self.name
+        }
+
+    @property
+    def full(self) -> dict:
+        return {
+            **self.short,
+            'users': [u.short for u in self.users],
+            'permissions': [p.short for p in self.permissions]
+        }
 
 
 class User(db.Model):
@@ -64,12 +94,18 @@ class User(db.Model):
         return list(set(perms))
 
     @property
-    def identity(self) -> dict:
+    def short(self) -> dict:
         return {
             'id': self.id,
             'active': self.active,
             'username': self.username,
             'name': self.name,
+        }
+
+    @property
+    def identity(self) -> dict:
+        return {
+            **self.short,
             'groups': [group.name for group in self.groups],
             'permissions': self.permissions
         }
