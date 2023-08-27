@@ -16,7 +16,7 @@ edit_group_route = Blueprint('edit_group', __name__)
 @jwt_required()
 def create_group():
     user = IamJwtUser()
-    if not user.has_rights('iam_create_group'):
+    if not user.has_rights('iam_group_manage'):
         return jsonify({'error': f"User {user.identity['username']} doesn't have rights to create groups."})
     name = str(request.json.get('name', None))
     try:
@@ -34,7 +34,7 @@ def create_group():
 def delete_group(id: str):
     user = IamJwtUser()
     id = str(id)
-    if not user.has_rights('iam_delete_group'):
+    if not user.has_rights('iam_group_manage'):
         return jsonify({'error': f"User {user.identity['username']} doesn't have rights to delete groups."})
 
     group = Group.query.get(id)
@@ -50,7 +50,7 @@ def delete_group(id: str):
 @jwt_required()
 def get_groups():
     user = IamJwtUser()
-    if not user.has_rights('iam_list_groups'):
+    if not user.has_rights('iam_group_manage'):
         return jsonify({'error': f"User {user.identity['username']} doesn't have rights to list groups."})
 
     try:
@@ -78,7 +78,7 @@ def get_group(id: str):
     user = IamJwtUser()
     id = str(id)
 
-    if not user.has_rights('iam_get_group'):
+    if not user.has_rights('iam_group_manage'):
         return jsonify({'error': f"User {user.identity['username']} doesn't have rights to get groups."})
 
     group = Group.query.get(id)
@@ -95,7 +95,7 @@ def edit_group(id: str):
     user = IamJwtUser()
     id = str(id)
 
-    if not user.has_rights('iam_edit_group'):
+    if not user.has_rights('iam_group_manage'):
         return jsonify({'error': f"User {user.identity['username']} doesn't have rights to edit groups."})
 
     group = Group.query.get(id)

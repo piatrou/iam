@@ -37,41 +37,18 @@ def upgrade():
     ])
     op.bulk_insert(Permission.__table__, [
         {
-            'name': 'iam_list_users',
-            'description': 'Allows to list all users'
+            'name': 'iam_users_manage',
+            'description': 'Permissions to manage users'
         },
         {
-            'name': 'iam_get_user',
-            'description': 'Allows to get any users'
+            'name': 'iam_group_manage',
+            'description': 'Permissions to manage groups'
         },
         {
-            'name': 'iam_edit_user',
-            'description': 'Allows to edit any users'
-        },
-        {
-            'name': 'iam_delete_user',
-            'description': 'Allows to delete any users'
-        },
-        {
-            'name': 'iam_create_group',
-            'description': 'Allows to create groups'
-        },
-        {
-            'name': 'iam_list_groups',
-            'description': 'Allows to list all groups'
-        },
-        {
-            'name': 'iam_get_group',
-            'description': 'Allows to get any groups'
-        },
-        {
-            'name': 'iam_edit_group',
-            'description': 'Allows to edit any groups'
-        },
-        {
-            'name': 'iam_delete_group',
-            'description': 'Allow to delete any group'
+            'name': 'iam_permission_manage',
+            'description': 'Permissions to manage groups'
         }
+
     ])
 
     op.execute(
@@ -106,7 +83,7 @@ def downgrade():
     )
     op.execute(
         'delete from "permission" '
-        "where name in ('iam_change_password', 'iam_list_users', 'iam_get_user', 'iam_edit_user')"
+        "where name in ('iam_users_manage', 'iam_group_manage', 'iam_permission_manage')"
     )
     op.execute(
         'delete from "user" '

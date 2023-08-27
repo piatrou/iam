@@ -48,7 +48,7 @@ def create_user():
 def get_users():
     user = IamJwtUser()
 
-    if not user.has_rights('iam_list_users'):
+    if not user.has_rights('iam_users_manage'):
         return jsonify({
             'error': f'User {user.identity["username"]} don\'t have permissions to list users'
         }), 403
@@ -83,7 +83,7 @@ def get_user(id: str = 'self'):
     if id == 'self':
         return jsonify(current_user.identity)
 
-    if not current_user.has_rights('iam_get_user'):
+    if not current_user.has_rights('iam_users_manage'):
         return jsonify({
             'error': f"User {current_user.identity['username']} doesn't have permissions to view users"
         }), 403
@@ -105,7 +105,7 @@ def edit_user(id: str = 'self'):
         id = 'self'
     current_user = IamJwtUser()
 
-    if not current_user.has_rights('iam_edit_user') and id != 0:
+    if not current_user.has_rights('iam_users_manage') and id != 0:
         return jsonify({
             'error': f"User {current_user.identity['username']} doesn't have permissions to edit users"
         }), 403
@@ -132,14 +132,14 @@ def edit_user(id: str = 'self'):
 
         if password is not None:
             password, old_password = str(password), str(old_password)
-            if not user.check_pass(old_password) and not current_user.has_rights('iam_edit_user'):
+            if not user.check_pass(old_password) and not current_user.has_rights('iam_users_manage'):
                 raise DataValidationError('Old password is not correct')
             validate_password(password)
             user.password = password
 
         if groups is not None:
             groups = list(groups)
-            if not current_user.has_rights('iam_edit_user'):
+            if not current_user.has_rights('iam_users_manage'):
                 raise DataValidationError("User doesn't have permissions to edit group list", 403)
             user.groups = Group.query.filter(Group.name.in_(groups)).all()
         db.session.commit()
@@ -161,7 +161,7 @@ def delete_user(id: str = 'self'):
         id = 'self'
     current_user = IamJwtUser()
 
-    if not current_user.has_rights('iam_delete_user') and id != 'self':
+    if not current_user.has_rights('iam_users_manage') and id != 'self':
         return jsonify({
             'error': f"User {current_user.identity['username']} doesn't have permissions to delete users"
         }), 403
@@ -177,5 +177,3 @@ def delete_user(id: str = 'self'):
     db.session.delete(user)
     db.session.commit()
     return jsonify({'error': None})
-
-
