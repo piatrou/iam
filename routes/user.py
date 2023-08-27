@@ -65,7 +65,7 @@ def get_users():
         users = User.query.paginate(page=page, per_page=10)
     return jsonify({
         'error': None,
-        'data': [u.identity for u in users.items],
+        'data': [u.short for u in users.items],
         'pages': users.pages,
         'page': users.page
     })
@@ -93,7 +93,7 @@ def get_user(id: str = 'self'):
     if user is None:
         return {'error': 'User not found.'}, 404
 
-    return jsonify(user.identity)
+    return jsonify({'error': None, 'data': user.identity})
 
 
 @edit_user_route.route('/api/iam/user/<id>', methods=['PUT'])
