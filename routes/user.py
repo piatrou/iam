@@ -156,7 +156,7 @@ def edit_user(id: str = 'self'):
 @jwt_required()
 def delete_user(id: str = 'self'):
     try:
-        id = int(id)
+        id = str(id)
     except ValueError:
         id = 'self'
     current_user = IamJwtUser()
