@@ -85,6 +85,15 @@ class Group(db.Model):
             'permissions': [p.short for p in self.permissions]
         }
 
+    @validates('name')
+    def validate_name(self, key, name):
+        name = str(name)
+        if len(name) <= 3:
+            raise DataValidationError('Group name must be longer than 3 symbols.')
+        if len(name) > 122:
+            raise DataValidationError('Group name can\'t be longer than 122 symbols.')
+        return name
+
 
 class User(db.Model):
     id = db.Column(db.String(122), default=generate_uuid, primary_key=True)

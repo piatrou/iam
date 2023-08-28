@@ -1,6 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from iam.common.jwt_user import JwtUser
-from iam.common.rest.errors import PermissionDenied, RestError, NotFound
+from iam.common.rest.errors import PermissionDenied, RestError, NotFound, DataValidationError
 from flask import Blueprint, request, jsonify, Response
 from flask_jwt_extended import jwt_required
 from typing import Union
@@ -81,7 +81,9 @@ class RestController:
                 self.db.session.add(entity)
                 self.db.session.commit()
                 return success(201)
-            except RestError as e:
+            except (RestError, ValueError) as e:
+                if type(e) == 'ValueError':
+                    return jsonify({'error': 'Wrong input data'}), 400
                 return e.response
 
     def create_prepare_data(self, user: JwtUser, req: request) -> dict:
@@ -105,7 +107,9 @@ class RestController:
                 self.db.session.delete(entity)
                 self.db.session.commit()
                 return success()
-            except RestError as e:
+            except (RestError, ValueError) as e:
+                if type(e) == 'ValueError':
+                    return jsonify({'error': 'Wrong input data'}), 400
                 return e.response
 
     def delete_check_perm(self, id: Union[int, str], user: JwtUser, req: request):
@@ -140,7 +144,9 @@ class RestController:
                     'pages': entities.pages,
                     'page': entities.page
                 })
-            except RestError as e:
+            except (RestError, ValueError) as e:
+                if type(e) == 'ValueError':
+                    return jsonify({'error': 'Wrong input data'}), 400
                 return e.response
 
     def list_check_perm(self, user: JwtUser, req: request):
@@ -165,7 +171,9 @@ class RestController:
                 if entity is None:
                     raise NotFound(f'{self.code} not found')
                 return jsonify({'error': None, 'data': entity.full})
-            except RestError as e:
+            except (RestError, ValueError) as e:
+                if type(e) == 'ValueError':
+                    return jsonify({'error': 'Wrong input data'}), 400
                 return e.response
 
     def get_check_perm(self, id: Union[int, str], user: JwtUser, req: request):
@@ -189,7 +197,9 @@ class RestController:
                 self.edit_prepare_data(entity, user, request)
                 self.db.session.commit()
                 return success()
-            except RestError as e:
+            except (RestError, ValueError) as e:
+                if type(e) == 'ValueError':
+                    return jsonify({'error': 'Wrong input data'}), 400
                 return e.response
 
     def edit_check_perm(self, id: Union[int, str], user: JwtUser, req: request):

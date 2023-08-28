@@ -6,7 +6,6 @@ from flask import request
 
 class PermissionRestController(RestController):
     def create_prepare_data(self, user: JwtUser, req: request) -> dict:
-        print(str(request.json.get('name', None)))
         return {
             'name': str(request.json.get('name', None)),
             'description': str(request.json.get('description', None))

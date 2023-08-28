@@ -9,13 +9,8 @@ from iam.routes.user import \
     get_user_route, \
     edit_user_route, \
     delete_user_route
-from iam.routes.group import \
-    create_group_route, \
-    get_groups_route, \
-    get_group_route, \
-    edit_group_route, \
-    delete_group_route
 from iam.routes.permissions import permission_controller
+from iam.routes.group import group_controller
 from flask_jwt_extended import JWTManager
 
 
@@ -48,11 +43,7 @@ def create_app():
         get_user_route,
         edit_user_route,
         delete_user_route,
-        create_group_route,
-        get_groups_route,
-        get_group_route,
-        edit_group_route,
-        delete_group_route,
+        *group_controller.get_routes(),
         *permission_controller.get_routes()
     ]:
         app.register_blueprint(route)
