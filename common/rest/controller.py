@@ -60,6 +60,7 @@ class RestEntity:
         self.init_delete_route()
         self.init_list_route()
         self.init_get_route()
+        self.init_edit_route()
 
     def init_blueprints(self):
         self.create_route = Blueprint(f'create_{self.code}', __name__)
@@ -200,3 +201,12 @@ class RestEntity:
 
     def create_prepare_data(self, entity: SQLAlchemy.Model, user: JwtUser, req: request) -> dict:
         raise NotImplementedError
+
+    def get_routes(self) -> list:
+        return [
+            self.create_route,
+            self.delete_route,
+            self.list_route,
+            self.get_route,
+            self.edit_route
+        ]
