@@ -15,7 +15,7 @@ def success(code: int = 200) -> tuple[Response, int]:
     return jsonify({'error': None}), code
 
 
-class RestEntity:
+class RestController:
     create_route: Blueprint = None
     delete_route: Blueprint = None
     list_route: Blueprint = None
@@ -26,7 +26,7 @@ class RestEntity:
     def __init__(
             self,
             code: str,
-            model: SQLAlchemy.Model,
+            model,
             api_path: str,
             db: SQLAlchemy,
             create_auth_required: bool = True,
@@ -181,12 +181,12 @@ class RestEntity:
         def edit_entity(id: Union[int, str]):
             try:
                 user = JwtUser()
-                id = self.get_prepare_id(id, user, request)
-                self.get_check_perm(id, user, request)
+                id = self.edit_prepare_id(id, user, request)
+                self.edit_check_perm(id, user, request)
                 entity = self.model.query.get(id)
                 if entity is None:
                     raise NotFound(f'{self.code} not found')
-                self.create_prepare_data(entity, user, request)
+                self.edit_prepare_data(entity, user, request)
                 self.db.session.commit()
                 return success()
             except RestError as e:
@@ -199,7 +199,7 @@ class RestEntity:
     def edit_prepare_id(self, id: Union[int, str], user: JwtUser, req: request) -> Union[int, str]:
         return id
 
-    def create_prepare_data(self, entity: SQLAlchemy.Model, user: JwtUser, req: request) -> dict:
+    def edit_prepare_data(self, entity, user: JwtUser, req: request):
         raise NotImplementedError
 
     def get_routes(self) -> list:

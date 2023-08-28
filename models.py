@@ -1,9 +1,10 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.orm import Mapped, relationship
+from sqlalchemy.orm import Mapped, relationship, validates
 from typing import List
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_migrate import Migrate
 import uuid
+from iam.common.rest.errors import DataValidationError
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -48,6 +49,15 @@ class Permission(db.Model):
             **self.short,
             'groups': [g.short for g in self.groups]
         }
+
+    @validates('name')
+    def validate_name(self, key, name):
+        name = str(name)
+        if len(name) <= 3:
+            raise DataValidationError('Permission name must be longer than 3 symbols.')
+        if len(name) > 122:
+            raise DataValidationError('Permission name can\'t be longer than 122 symbols.')
+        return name
 
 
 class Group(db.Model):

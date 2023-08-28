@@ -20,3 +20,7 @@ class PermissionDenied(RestError):
 
 class NotFound(RestError):
     code = 404
+
+
+class DataValidationError(RestError):
+    code = 400
